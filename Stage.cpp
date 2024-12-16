@@ -34,6 +34,7 @@ void Stage::SetMap()
 	int wholeheight = height;//全体の縦幅
 	height = (wholeheight - 1) / 2;//マップの縦幅取得
 
+	int scount = 0;
 	for (int h = 0; h < height; h++)
 	{
 		for (int w = 0; w < width; w++)
@@ -41,11 +42,14 @@ void Stage::SetMap()
 			Map[h][w] = csv.GetInt(w, h);
 			if (Map[h][w] == 100)
 			{
-				StageboxColl = new BoxCollider({ (float)w,(float)-h,0 }, { 1.0,1.0,1.0 });
-				AddCollider(StageboxColl);
+				StageboxColl.push_back(new BoxCollider({ (float)w,(float)-h,0 }, { 1.0,1.0,1.0 }));
+				AddCollider(StageboxColl[scount]);
+				scount++;
 			}
 		}
 	}
+
+	scount = 0;
 
 	for (int h = 0; h < height; h++)
 	{
@@ -69,9 +73,6 @@ void Stage::Initialize()
 {
 	hModel_ = Model::Load("Box.fbx");
 	assert(hModel_ >= 0);
-
-	//StageboxColl = new BoxCollider({ 0,0,0 }, { 1.0,1.0,1.0 });
-	//AddCollider(StageboxColl);
 }
 
 void Stage::Update()
@@ -104,47 +105,4 @@ void Stage::Draw()
 
 void Stage::Release()
 {
-}
-
-int Stage::CollisionRight(int x, int y)
-{
-	if (IsWallBlock(x, y))
-	{
-		//当たっているので、めり込んだ量を返す
- 		return x;
-	}
-	else
-		return 0;
-}
-
-int Stage::CollisionLeft(int x, int y)
-{
-	return 0;
-}
-
-int Stage::CollisionDown(int x, int y)
-{
-	return 0;
-}
-
-int Stage::CollisionUp(int x, int y)
-{
-	return 0;
-}
-
-bool Stage::IsWallBlock(int x, int y)
-{
-	if (x >= 0 || x < width || -y >= 0 || -y < height)
-	{
-		Player* pplayer = GetParent()->FindGameObject<Player>();
-		if (pplayer != nullptr)
-		{
-			switch (Map[x][-y])
-			{
-			case 100:
-				return true;
-			}
-			return false;
-		}
-	}
 }

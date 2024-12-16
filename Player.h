@@ -3,6 +3,7 @@
 #include "Engine/Transform.h"
 class FBX;
 class BoxCollider;
+class Stage;
 
 class Player :
     public GameObject
@@ -11,6 +12,7 @@ class Player :
 	const float GRAVITY = 8.0f / 650.0f;    //重力加速度
 
 	BoxCollider* PboxColl[4];
+	Stage* stage;
 
 	int hModel_;
 	void MovePlayer();//プレイヤー移動
@@ -37,6 +39,6 @@ public:
 
 	//何かに当たった
 	//引数：pTarget 当たった相手
-	void OnCollision(GameObject* pTarget) override;
+	//void OnCollision(GameObject* pTarget) override;
 };
 
