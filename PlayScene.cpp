@@ -2,6 +2,7 @@
 #include "Engine/Fbx.h"
 #include "Player.h"
 #include "Stage.h"
+#include "Engine/Input.h"
 
 PlayScene::PlayScene(GameObject* parent)
 	:GameObject(parent, "PlayScene")

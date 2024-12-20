@@ -13,19 +13,21 @@ class Stage :
 	Player* pplayer;
 	vector<BoxCollider*> StageboxColl;
 
-	int hModel_;
 	int width; //ステージ幅
 	int height;//ステージ高さ
+	vector<int> hBrocks_;//ブロックのデータを持つ配列
 	vector<vector<int>> Map;//マップのデータを持つ配列
 
 public:
 	Stage(GameObject* parent);
 	~Stage();
-	vector<BoxCollider*> GetStageboxColl(){return StageboxColl;}
-	void SetMap();
 	void Initialize() override;
 	void Update() override;
 	void Draw() override;
 	void Release() override;
+
+	vector<BoxCollider*> GetStageboxColl(){return StageboxColl;}
+	//int GetModelHandle() { return (hModel_); }
+	void SetMap();
 };
 

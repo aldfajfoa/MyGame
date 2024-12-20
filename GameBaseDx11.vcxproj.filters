@@ -122,6 +122,9 @@
     <ClCompile Include="Player.cpp">
       <Filter>Player</Filter>
     </ClCompile>
+    <ClCompile Include="Arrow.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\BoxCollider.h">
@@ -210,6 +213,9 @@
     </ClInclude>
     <ClInclude Include="Stage.h">
       <Filter>Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Arrow.h">
+      <Filter>Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

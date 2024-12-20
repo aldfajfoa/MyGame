@@ -1,16 +1,15 @@
 #pragma once
 #include "Engine/GameObject.h"
-class Fbx;
-class Stage;
+class Player;
 
-class PlayScene :
+class Arrow :
     public GameObject
 {
-private:
-	Stage* pField;
+	int hArrow_;
+	Player* p;
 public:
-	PlayScene(GameObject* parent);
-	~PlayScene();
+	Arrow(GameObject* parent);
+	~Arrow();
 
 	void Initialize() override;
 	void Update() override;

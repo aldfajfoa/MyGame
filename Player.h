@@ -8,18 +8,26 @@ class Stage;
 class Player :
     public GameObject
 {
-	const float JUMP_HEIGHT = 1.0f * 3.0f;//ジャンプの高さ
-	const float GRAVITY = 8.0f / 650.0f;    //重力加速度
+	enum Dir//プレイヤーの向き
+	{
+		LEFT,RIGHT
+	};
+	Dir pDir;
+
+	const float JUMP_HEIGHT = 1.0f * 10.0f;//ジャンプの高さ
+	const float GRAVITY = 9.0f / 650.0f;    //重力加速度
 
 	BoxCollider* PboxColl[4];
 	Stage* stage;
 
-	int hModel_;
-	void MovePlayer();//プレイヤー移動
-	float jumpSpeed_;
+	int hPlayer_;
+	float jumpSpeed_;//ジャンプの高さ
 	int Ground_;
-	bool isMove_;//移動できるか
+	float CameraStopGround_;//これより下にいくとカメラがプレイヤーを追わなくなる
+	float DeathGround_;//ここまで落ちたらゲームオーバー
 	bool isLeftMove_, isRightMove_, isJump_;//左右移動とジャンプができるかの判定
+
+	void MovePlayer();//プレイヤー移動
 public:
 	Player(GameObject* parent);
 	~Player();
@@ -31,14 +39,15 @@ public:
 
 	void SetGround(float _ground) { Ground_ = _ground; }
 
-	//プレイヤーのポジション
-	void SetPositionXY(float x, float y) { transform_.position_ = { x,y,0 }; }
+	void SetPositionXY(float x, float y) { transform_.position_ = { x,y,0 }; }//プレイヤーのポジション
 
-	//プレイヤーの当たり判定周りの処理関数
-	void ControlCollision();
+	void RotPlayer(Dir dir);//プレイヤーの向きを変える
+	Dir GetpDir() { return pDir; }
 
-	//何かに当たった
-	//引数：pTarget 当たった相手
-	//void OnCollision(GameObject* pTarget) override;
+	void ControlCollision();//プレイヤーの当たり判定周りの処理関数
+
+	//CameraStopGround_を設定しそれを元にDeathGround_の設定もする
+	void SetCameraStopandDeathGround_(float _Ground) { CameraStopGround_ = _Ground; 
+	                                                   DeathGround_ = CameraStopGround_ - 20;}
 };
 

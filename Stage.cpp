@@ -9,7 +9,7 @@
 using std::string;
 
 Stage::Stage(GameObject* parent)
-	:GameObject(parent, "Stage"), hModel_(-1)
+	:GameObject(parent, "Stage")
 {
 }
 
@@ -40,11 +40,16 @@ void Stage::SetMap()
 		for (int w = 0; w < width; w++)
 		{
 			Map[h][w] = csv.GetInt(w, h);
-			if (Map[h][w] == 100)
+			switch (Map[h][w])
+			{
+			case 100:
+			case 101:
 			{
 				StageboxColl.push_back(new BoxCollider({ (float)w,(float)-h,0 }, { 1.0,1.0,1.0 }));
 				AddCollider(StageboxColl[scount]);
 				scount++;
+			}
+			break;
 			}
 		}
 	}
@@ -67,12 +72,19 @@ void Stage::SetMap()
 			}
 		}
 	}
+
+	pplayer->SetCameraStopandDeathGround_(-height);
 }
 
 void Stage::Initialize()
 {
-	hModel_ = Model::Load("Box.fbx");
-	assert(hModel_ >= 0);
+	hBrocks_.push_back(Model::Load("Box.fbx"));
+	hBrocks_.push_back(Model::Load("Box2.fbx"));
+
+	for (int i = 0; i < hBrocks_.size(); i++)
+	{
+		assert(hBrocks_[i] >= 0);
+	}
 }
 
 void Stage::Update()
@@ -92,8 +104,15 @@ void Stage::Draw()
 			case 100:
 			{
 				t.position_ = { x,-y,0 };
-				Model::SetTransform(hModel_, t);
-				Model::Draw(hModel_);
+				Model::SetTransform(hBrocks_[Map[y][x]-100], t);
+				Model::Draw(hBrocks_[Map[y][x] - 100]);
+				break;
+			}
+			case 101:
+			{
+				t.position_ = { x,-y,0 };
+				Model::SetTransform(hBrocks_[Map[y][x] - 100], t);
+				Model::Draw(hBrocks_[Map[y][x] - 100]);
 				break;
 			}
 			default:

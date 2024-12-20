@@ -69,5 +69,10 @@ public:
 	//セッター
 	void SetGameObject(GameObject* gameObject) { pGameObject_ = gameObject; }
 
+	//モデルのハンドルを取得
+	int GethDebugHandle() { return (hDebugModel_); }
+
+	//位置を取得
+	XMFLOAT3 Getcenter() { return center_; }
 };
 

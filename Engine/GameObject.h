@@ -6,6 +6,7 @@
 #include "SphereCollider.h"
 #include "BoxCollider.h"
 #include "Transform.h"
+#include "Global.h"
 
 using namespace DirectX;
 
@@ -28,6 +29,20 @@ protected:
 	std::list<Collider*>	colliderList_;	
 
 public:
+	struct BrockData {
+		int handle;
+		int BrockID;
+	};
+
+	struct Size {
+		int w;
+		int h;
+	};
+	struct MapData {
+		int mNum;
+		int BrockID;
+	};
+
 	//コンストラクタ
 	GameObject();
 	GameObject(GameObject* parent);
@@ -55,7 +70,6 @@ public:
 	//ワールド行列の取得（親の影響を受けた最終的な行列）
 	//戻値：ワールド行列
 	XMMATRIX GetWorldMatrix();
-
 
 
 	//各フラグの制御
