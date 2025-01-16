@@ -10,6 +10,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
+#define SAFE_DELETE(p) {if ((p)!=nullptr) { delete (p); (p)=nullptr;}}
 
 
 //-----------------------------------------------------------

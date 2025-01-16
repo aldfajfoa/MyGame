@@ -2,6 +2,7 @@
 #include "Engine/Fbx.h"
 #include "Player.h"
 #include "Stage.h"
+#include "HP.h"
 #include "Engine/Input.h"
 
 PlayScene::PlayScene(GameObject* parent)
@@ -15,9 +16,10 @@ PlayScene::~PlayScene()
 
 void PlayScene::Initialize()
 {
-	pField = Instantiate<Stage>(this);
+	pField_ = Instantiate<Stage>(this);
 	Instantiate<Player>(this);
-	pField->SetMap();
+	pField_->SetMap();
+	Instantiate<HP>(this);
 }
 
 void PlayScene::Update()

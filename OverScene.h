@@ -1,13 +1,10 @@
 #pragma once
 #include "Engine/GameObject.h"
-class Sprite;
 
 class OverScene :
     public GameObject
 {
-	const Size IMAGE_SIZE = { 1280,720 };
 	int hImage_;
-	Sprite* sprite_;
 public:
 	OverScene(GameObject* parent);
 	void Initialize() override {};

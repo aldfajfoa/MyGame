@@ -6,7 +6,7 @@
 GameObject::GameObject(void) :
 	GameObject(nullptr, "")
 {
-
+	
 }
 
 //コンストラクタ（名前なし）
@@ -17,11 +17,7 @@ GameObject::GameObject(GameObject * parent) :
 
 //コンストラクタ（標準）
 GameObject::GameObject(GameObject * parent, const std::string& name)
-	: pParent_(parent),
-
-
-
-	objectName_(name)
+	: pParent_(parent),objectName_(name)
 {
 	childList_.clear();
 	state_ = { 0, 1, 1, 0 };
@@ -350,14 +346,6 @@ void GameObject::ReleaseSub()
 	Release();
 }
 
-
-
-
-////ローカル行列の取得（このオブジェクトの行列）
-//XMMATRIX GameObject::GetLocalMatrix(void)
-//{
-//	return transform_.GetWorldMatrix();
-//}
 
 //ワールド行列の取得（親の影響を受けた最終的な行列）
 XMMATRIX GameObject::GetWorldMatrix(void)

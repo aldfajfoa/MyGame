@@ -1,13 +1,12 @@
 #include "ClearScene.h"
 #include "Engine/Input.h"
 #include "Engine/SceneManager.h"
-#include "Engine/Sprite.h"
+#include "Engine/Image.h"
 
 ClearScene::ClearScene(GameObject* parent)
-	:GameObject(parent, "ClearScene")
+	:GameObject(parent, "ClearScene"), hImage_(-1)
 {
-	sprite_ = new Sprite;
-	hImage_ = sprite_->Load("CLEAR.png");
+	hImage_ = Image::Load("CLEAR.png");
 	assert(hImage_ >= 0);
 }
 
@@ -22,11 +21,10 @@ void ClearScene::Update()
 
 void ClearScene::Draw()
 {
-	RECT r = { 0,0,IMAGE_SIZE.w,IMAGE_SIZE.h };
-	sprite_->Draw(transform_, r, 1);
+	Image::SetTransform(hImage_, transform_);
+	Image::Draw(hImage_);
 }
 
 void ClearScene::Release()
 {
-	SAFE_DELETE(sprite_);
 }

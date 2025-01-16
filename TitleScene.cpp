@@ -1,17 +1,14 @@
 #include "TitleScene.h"
 #include "Engine/Input.h"
 #include "Engine/SceneManager.h"
-#include "Engine/Sprite.h"
+#include "Engine/Image.h"
 
 TitleScene::TitleScene(GameObject* parent)
-	:GameObject(parent,"TitleScene")
+	:GameObject(parent,"TitleScene"),hImage_(-1)
 {
-	sprite_ = new Sprite;
-	hImage_ = sprite_->Load("TITLE.png");
+	hImage_ = Image::Load("TITLE.png");
 	assert(hImage_ >= 0);
 }
-
-//void TitleScene::Initialize(){}
 
 void TitleScene::Update()
 {
@@ -24,11 +21,10 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
-	RECT r = {0,0,IMAGE_SIZE.w,IMAGE_SIZE.h};
-	sprite_->Draw(transform_,r,1);
+	Image::SetTransform(hImage_, transform_);
+	Image::Draw(hImage_);
 }
 
 void TitleScene::Release()
 {
-	SAFE_DELETE(sprite_);
 }

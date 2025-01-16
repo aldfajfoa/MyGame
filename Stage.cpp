@@ -13,40 +13,36 @@ Stage::Stage(GameObject* parent)
 {
 }
 
-Stage::~Stage()
-{
-}
-
 void Stage::SetMap()
 {
-	if (Map.empty()) 
+	if (Map_.empty()) 
 	{
-		Map.clear();
+		Map_.clear();
 	}
 	CsvReader csv;//データを読むクラスのインスタンスを作成
 	bool ret = csv.Load("Stage.csv");
 	assert(ret);
-	width = csv.GetWidth(0);//横幅を取得
-	height = csv.GetHeight();
+	width_ = csv.GetWidth(0);//横幅を取得
+	height_ = csv.GetHeight();
 
-	Map.resize(height, vector<int>(width));//サイズを変更
+	Map_.resize(height_, vector<int>(width_));//サイズを変更
 
-	int wholeheight = height;//全体の縦幅
-	height = (wholeheight - 1) / 2;//マップの縦幅取得
+	int wholeheight = height_;//全体の縦幅
+	height_ = (wholeheight - 1) / 2;//マップの縦幅取得
 
 	int scount = 0;
-	for (int h = 0; h < height; h++)
+	for (int h = 0; h < height_; h++)
 	{
-		for (int w = 0; w < width; w++)
+		for (int w = 0; w < width_; w++)
 		{
-			Map[h][w] = csv.GetInt(w, h);
-			switch (Map[h][w])
+			Map_[h][w] = csv.GetInt(w, h);
+			switch (Map_[h][w])
 			{
 			case 100:
 			case 101:
 			{
-				StageboxColl.push_back(new BoxCollider({ (float)w,(float)-h,0 }, { 1.0,1.0,1.0 }));
-				AddCollider(StageboxColl[scount]);
+				StageboxColl_.push_back(new BoxCollider({ (float)w,(float)-h,0 }, { 1.0,1.0,1.0 }));
+				AddCollider(StageboxColl_[scount]);
 				scount++;
 			}
 			break;
@@ -56,24 +52,24 @@ void Stage::SetMap()
 
 	scount = 0;
 
-	for (int h = 0; h < height; h++)
+	for (int h = 0; h < height_; h++)
 	{
-		for (int w = 0; w < width; w++)
+		for (int w = 0; w < width_; w++)
 		{
-			switch (csv.GetInt(w, h + height + 1))
+			switch (csv.GetInt(w, h + height_ + 1))
 			{
 			case 0://プレイヤー
 			{
-				pplayer = GetParent()->FindGameObject<Player>();
-				pplayer->SetPositionXY(w, -h);
-				pplayer->SetGround(-h);
+				pplayer_ = GetParent()->FindGameObject<Player>();
+				pplayer_->SetPositionXY(w, -h);
+				pplayer_->SetGround(-h);
 			}
 			break;
 			}
 		}
 	}
 
-	pplayer->SetCameraStopandDeathGround_(-height);
+	pplayer_->SetCameraStopandDeathGround_(-height_);
 }
 
 void Stage::Initialize()
@@ -95,24 +91,24 @@ void Stage::Draw()
 {
 	Transform t;
 	
-	for (float y = 0; y < height; y++)
+	for (float y = 0; y < height_; y++)
 	{
-		for (float x = 0; x < width; x++)
+		for (float x = 0; x < width_; x++)
 		{
-			switch (Map[y][x])
+			switch (Map_[y][x])
 			{
 			case 100:
 			{
 				t.position_ = { x,-y,0 };
-				Model::SetTransform(hBrocks_[Map[y][x]-100], t);
-				Model::Draw(hBrocks_[Map[y][x] - 100]);
+				Model::SetTransform(hBrocks_[Map_[y][x]-100], t);
+				Model::Draw(hBrocks_[Map_[y][x] - 100]);
 				break;
 			}
 			case 101:
 			{
 				t.position_ = { x,-y,0 };
-				Model::SetTransform(hBrocks_[Map[y][x] - 100], t);
-				Model::Draw(hBrocks_[Map[y][x] - 100]);
+				Model::SetTransform(hBrocks_[Map_[y][x] - 100], t);
+				Model::Draw(hBrocks_[Map_[y][x] - 100]);
 				break;
 			}
 			default:
@@ -124,4 +120,7 @@ void Stage::Draw()
 
 void Stage::Release()
 {
+	StageboxColl_.clear();
+	Map_.clear();
+	hBrocks_.clear();
 }

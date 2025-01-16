@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Stage.h"
 #include "Arrow.h"
+#include "PlayScene.h"
 #include "Engine/FBX.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
@@ -9,13 +10,9 @@
 #include "Engine/SceneManager.h"
 
 Player::Player(GameObject* parent)
-	:GameObject(parent,"Player"), hPlayer_(-1), Ground_(0), isLeftMove_(true), isRightMove_(true),isJump_(true),pDir(RIGHT)
+	:GameObject(parent,"Player"), hPlayer_(-1), Ground_(0), isLeftMove_(true), isRightMove_(true),isJump_(true),pDir_(RIGHT)
 {
 	jumpSpeed_ = 0.0f;
-}
-
-Player::~Player()
-{
 }
 
 void Player::Initialize()
@@ -25,16 +22,16 @@ void Player::Initialize()
 	transform_.rotate_.y = 90;
 
 	//上下左右の当たり判定
-	PboxColl[0] = new BoxCollider({ -0.3, 0.1,0 }, { 0.3,1.0,0.1 });//左
-	PboxColl[1] = new BoxCollider({  0.5, 0.1,0 }, { 0.3,1.0,0.1 });//右
-	PboxColl[2] = new BoxCollider({  0.1, 0.7,0 }, { 0.5,0.3,0.1 });//上
-	PboxColl[3] = new BoxCollider({  0.1,-20, 0 }, { 0.5, 40,0.1 });//下
+	PboxColl_[0] = new BoxCollider({ -0.3, 0.1,0 }, { 0.3,1.0,0.1 });//左
+	PboxColl_[1] = new BoxCollider({  0.5, 0.1,0 }, { 0.3,1.0,0.1 });//右
+	PboxColl_[2] = new BoxCollider({  0.1, 0.7,0 }, { 0.5,0.3,0.1 });//上
+	PboxColl_[3] = new BoxCollider({  0.1,-20, 0 }, { 0.5, 40,0.1 });//下
 	for (int i = 0; i < 4; i++)
 	{
-		AddCollider(PboxColl[i]);
+		AddCollider(PboxColl_[i]);
 	}
 
-	stage = GetParent()->FindGameObject<Stage>();
+	stage_ = GetParent()->FindGameObject<Stage>();
 }
 
 void Player::Update()
@@ -49,8 +46,8 @@ void Player::Update()
 	
 	if (transform_.position_.y > CameraStopGround_)//ここでカメラが止まる
 	{
-		XMFLOAT3 t = { transform_.position_.x,transform_.position_.y,transform_.position_.z };
-		XMFLOAT3 p = { transform_.position_.x,transform_.position_.y,-10 + transform_.position_.z };
+		XMFLOAT3 t = { transform_.position_.x,transform_.position_.y+1,transform_.position_.z };
+		XMFLOAT3 p = { transform_.position_.x,transform_.position_.y+1,-10 + transform_.position_.z };
 		Camera::SetTarget(t);
 		Camera::SetPosition(p);
 	}
@@ -60,11 +57,11 @@ void Player::Update()
 		pSceneManager->ChangeScene(SCENE_ID_OVER);
 	}
 
-	ControlCollision();
+	PlayerCollision();
 
-	if (Input::IsKeyDown(DIK_J))//矢を撃つ
+	if (Input::IsKeyDown(DIK_F))//矢を撃つ
 	{
-		Instantiate<Arrow>(this);
+		Instantiate<Arrow>(FindObject("PlayScene"));
 	}
 }
 
@@ -78,7 +75,7 @@ void Player::Release()
 {
 }
 
-void Player::RotPlayer(Dir dir)
+void Player::RotPlayer(const Dir& dir)
 {
 	if (dir == LEFT)
 	{
@@ -97,12 +94,12 @@ void Player::RotPlayer(Dir dir)
 	}
 }
 
-void Player::ControlCollision()
+void Player::PlayerCollision()
 {
 	//左当たり判定
-	for (int i = 0; i < stage->GetStageboxColl().size(); i++)
+	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
-		if (PboxColl[0]->IsHit(stage->GetStageboxColl()[i])) {
+		if (PboxColl_[0]->IsHit(stage_->GetStageboxColl()[i])) {
 			isLeftMove_ = false;
 			break;
 		}
@@ -113,9 +110,9 @@ void Player::ControlCollision()
 	}
 
 	//右当たり判定
-	for (int i = 0; i < stage->GetStageboxColl().size(); i++)
+	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
-		if (PboxColl[1]->IsHit(stage->GetStageboxColl()[i])) {
+		if (PboxColl_[1]->IsHit(stage_->GetStageboxColl()[i])) {
 			isRightMove_ = false;
 			break;
 		}
@@ -126,10 +123,10 @@ void Player::ControlCollision()
 	}
 
 	//上当たり判定
-	for (int i = 0; i < stage->GetStageboxColl().size(); i++)
+	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
 		if (isJump_) {
-			if (PboxColl[2]->IsHit(stage->GetStageboxColl()[i])) {
+			if (PboxColl_[2]->IsHit(stage_->GetStageboxColl()[i])) {
 				jumpSpeed_ = 0;
 				isJump_ = false;
 				break;
@@ -138,10 +135,10 @@ void Player::ControlCollision()
 	}
 
 	//下当たり判定
-	for (int i = 0; i < stage->GetStageboxColl().size(); i++)
+	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
-		if (PboxColl[3]->IsHit(stage->GetStageboxColl()[i])) {
-			Ground_ = stage->GetStageboxColl()[i]->Getcenter().y+0.5;
+		if (PboxColl_[3]->IsHit(stage_->GetStageboxColl()[i])) {
+			Ground_ = stage_->GetStageboxColl()[i]->Getcenter().y+0.5;
 			break;
 		}
 		else
@@ -155,7 +152,6 @@ void Player::MovePlayer()
 {
 	if (isLeftMove_)
 	{
-
 		if (Input::IsKey(DIK_LEFT))//左へ進む
 		{
 			transform_.position_.x -= 0.05;
@@ -163,7 +159,7 @@ void Player::MovePlayer()
 	}
 	if (Input::IsKey(DIK_LEFT))
 	{
-		pDir = LEFT;
+		pDir_ = LEFT;
 	}
 
 	if (isRightMove_)
@@ -175,7 +171,7 @@ void Player::MovePlayer()
 	}
 	if (Input::IsKey(DIK_RIGHT))//右へ進む
 	{
-		pDir = RIGHT;
+		pDir_ = RIGHT;
 	}
 
 	if (isJump_)
@@ -190,6 +186,6 @@ void Player::MovePlayer()
 	jumpSpeed_ += GRAVITY;//速度+=加速度
 	transform_.position_.y -= jumpSpeed_;//座標+=速度
 
-	RotPlayer(pDir);
+	RotPlayer(pDir_);
 }
 

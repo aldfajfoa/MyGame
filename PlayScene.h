@@ -7,7 +7,7 @@ class PlayScene :
     public GameObject
 {
 private:
-	Stage* pField;
+	Stage* pField_;
 public:
 	PlayScene(GameObject* parent);
 	~PlayScene();

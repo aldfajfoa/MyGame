@@ -1,13 +1,12 @@
 #include "OverScene.h"
 #include "Engine/Input.h"
 #include "Engine/SceneManager.h"
-#include "Engine/Sprite.h"
+#include "Engine/Image.h"
 
 OverScene::OverScene(GameObject* parent)
-	:GameObject(parent, "OverScene")
+	:GameObject(parent, "OverScene"), hImage_(-1)
 {
-	sprite_ = new Sprite;
-	hImage_ = sprite_->Load("OVER.png");
+	hImage_ = Image::Load("OVER.png");
 	assert(hImage_ >= 0);
 }
 
@@ -22,11 +21,10 @@ void OverScene::Update()
 
 void OverScene::Draw()
 {
-	RECT r = { 0,0,IMAGE_SIZE.w,IMAGE_SIZE.h };
-	sprite_->Draw(transform_, r, 1);
+	Image::SetTransform(hImage_, transform_);
+	Image::Draw(hImage_);
 }
 
 void OverScene::Release()
 {
-	SAFE_DELETE(sprite_);
 }
