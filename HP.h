@@ -5,12 +5,15 @@ class Sprite;
 class HP :
     public GameObject
 {
+	//定数
 	const Size IMAGE_SIZE = { 512,32 };//画像サイズ
 	const XMFLOAT2 HP_POS = { -0.9,-0.7 };
 	const int MAX_HP = 500;//HP最大値
 
+	//ハンドル
 	int hHp_;
 
+	//その他の変数
 	float currentHp_;//現在HP
 public:
 	HP(GameObject* parent);

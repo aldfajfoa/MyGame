@@ -3,24 +3,30 @@
 class Player;
 class BoxCollider;
 class Stage;
+class Timer;
 
 class Arrow :
 	public GameObject
 {
+	//定数
 	const float MOVE_SPEED = 0.4;
 
+	//ポインタ
 	Player* player_;
 	Stage* stage_;
 	BoxCollider* AboxColl_;
+	Timer* timer_;
 
+	//ハンドル
 	int hArrow_;
 
-	Dir aDir_;//プレイヤーの左右の向きを持つ変数
+	//その他の変数
+	bool PisRight_;//プレイヤーが右向きか左向きか
 	bool isMove_;
 	float dy_;
 	float Gravity_;
 
-	bool KillTimer(const float& time);//当たってから消えるまでの時間
+	//関数
 	void ArrowCollision();
 public:
 	Arrow(GameObject* parent);

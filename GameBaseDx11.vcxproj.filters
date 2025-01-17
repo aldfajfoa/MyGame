@@ -128,6 +128,10 @@
     <ClCompile Include="HP.cpp">
       <Filter>Player</Filter>
     </ClCompile>
+    <ClCompile Include="Gool.cpp">
+      <Filter>Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\BoxCollider.h">
@@ -223,6 +227,10 @@
     <ClInclude Include="HP.h">
       <Filter>Player</Filter>
     </ClInclude>
+    <ClInclude Include="Gool.h">
+      <Filter>Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shader\Simple2D.hlsl">

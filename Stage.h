@@ -9,11 +9,14 @@ class BoxCollider;
 class Stage :
     public GameObject
 {
+	//ポインタ
 	Player* pplayer_;
 	vector<BoxCollider*> StageboxColl_;
 
+	//ハンドル
 	vector<int> hBrocks_;//ブロックのハンドルを持つ配列
 
+	//その他の変数
 	int width_; //ステージ幅
 	int height_;//ステージ高さ
 	vector<vector<int>> Map_;//マップのデータを持つ配列

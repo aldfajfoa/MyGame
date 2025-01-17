@@ -10,26 +10,10 @@ PlayScene::PlayScene(GameObject* parent)
 {
 }
 
-PlayScene::~PlayScene()
-{
-}
-
 void PlayScene::Initialize()
 {
 	pField_ = Instantiate<Stage>(this);
 	Instantiate<Player>(this);
 	pField_->SetMap();
 	Instantiate<HP>(this);
-}
-
-void PlayScene::Update()
-{
-}
-
-void PlayScene::Draw()
-{
-}
-
-void PlayScene::Release()
-{
 }

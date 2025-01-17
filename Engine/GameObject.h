@@ -40,13 +40,17 @@ public:
 	enum Dir//ƒvƒŒƒCƒ„[‚ÌŒü‚«
 	{
 		LEFT, 
-		RIGHT
+		RIGHT,
+		TOP,
+		UNDER,
+		CENTER
 	};
 
 	struct Size {
 		int w;
 		int h;
 	};
+
 	struct MapData {
 		int mNum;
 		int BrockID;

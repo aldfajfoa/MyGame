@@ -2,7 +2,6 @@
 #include "Stage.h"
 #include "Arrow.h"
 #include "PlayScene.h"
-#include "Engine/FBX.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
 #include "Engine/Camera.h"
@@ -10,7 +9,7 @@
 #include "Engine/SceneManager.h"
 
 Player::Player(GameObject* parent)
-	:GameObject(parent,"Player"), hPlayer_(-1), Ground_(0), isLeftMove_(true), isRightMove_(true),isJump_(true),pDir_(RIGHT)
+	:GameObject(parent,"Player"), hPlayer_(-1), Ground_(0),isLeftMove_(true), isRightMove_(true),isJump_(true), isRight_(true)
 {
 	jumpSpeed_ = 0.0f;
 }
@@ -26,7 +25,8 @@ void Player::Initialize()
 	PboxColl_[1] = new BoxCollider({  0.5, 0.1,0 }, { 0.3,1.0,0.1 });//右
 	PboxColl_[2] = new BoxCollider({  0.1, 0.7,0 }, { 0.5,0.3,0.1 });//上
 	PboxColl_[3] = new BoxCollider({  0.1,-20, 0 }, { 0.5, 40,0.1 });//下
-	for (int i = 0; i < 4; i++)
+	PboxColl_[4] = new BoxCollider({ 0, 0.1, 0 }, { 0.7, 1.2,0.1 });//中心(敵やゴールと判定する用)
+	for (int i = 0; i < PBOX_NUM; i++)
 	{
 		AddCollider(PboxColl_[i]);
 	}
@@ -75,9 +75,9 @@ void Player::Release()
 {
 }
 
-void Player::RotPlayer(const Dir& dir)
+void Player::RotPlayer(const bool& isRight)
 {
-	if (dir == LEFT)
+	if (isRight_ == false)
 	{
 		if (transform_.rotate_.y != -90)
 		{
@@ -85,7 +85,7 @@ void Player::RotPlayer(const Dir& dir)
 		}
 	}
 
-	if (dir == RIGHT)
+	if (isRight_)
 	{
 		if (transform_.rotate_.y != 90)
 		{
@@ -99,7 +99,7 @@ void Player::PlayerCollision()
 	//左当たり判定
 	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
-		if (PboxColl_[0]->IsHit(stage_->GetStageboxColl()[i])) {
+		if (PboxColl_[LEFT]->IsHit(stage_->GetStageboxColl()[i])) {
 			isLeftMove_ = false;
 			break;
 		}
@@ -112,7 +112,7 @@ void Player::PlayerCollision()
 	//右当たり判定
 	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
-		if (PboxColl_[1]->IsHit(stage_->GetStageboxColl()[i])) {
+		if (PboxColl_[RIGHT]->IsHit(stage_->GetStageboxColl()[i])) {
 			isRightMove_ = false;
 			break;
 		}
@@ -126,7 +126,7 @@ void Player::PlayerCollision()
 	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
 		if (isJump_) {
-			if (PboxColl_[2]->IsHit(stage_->GetStageboxColl()[i])) {
+			if (PboxColl_[TOP]->IsHit(stage_->GetStageboxColl()[i])) {
 				jumpSpeed_ = 0;
 				isJump_ = false;
 				break;
@@ -137,7 +137,7 @@ void Player::PlayerCollision()
 	//下当たり判定
 	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
 	{
-		if (PboxColl_[3]->IsHit(stage_->GetStageboxColl()[i])) {
+		if (PboxColl_[UNDER]->IsHit(stage_->GetStageboxColl()[i])) {
 			Ground_ = stage_->GetStageboxColl()[i]->Getcenter().y+0.5;
 			break;
 		}
@@ -159,7 +159,7 @@ void Player::MovePlayer()
 	}
 	if (Input::IsKey(DIK_LEFT))
 	{
-		pDir_ = LEFT;
+		isRight_ = false;
 	}
 
 	if (isRightMove_)
@@ -171,7 +171,7 @@ void Player::MovePlayer()
 	}
 	if (Input::IsKey(DIK_RIGHT))//右へ進む
 	{
-		pDir_ = RIGHT;
+		isRight_ = true;
 	}
 
 	if (isJump_)
@@ -186,6 +186,6 @@ void Player::MovePlayer()
 	jumpSpeed_ += GRAVITY;//速度+=加速度
 	transform_.position_.y -= jumpSpeed_;//座標+=速度
 
-	RotPlayer(pDir_);
+	RotPlayer(isRight_);
 }
 

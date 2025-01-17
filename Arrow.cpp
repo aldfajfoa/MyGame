@@ -3,6 +3,7 @@
 #include "Stage.h"
 #include "Engine/Model.h"
 #include "Engine/BoxCollider.h"
+#include "Timer.h"
 
 Arrow::Arrow(GameObject* parent)
 	:GameObject(parent, "Arrow"),isMove_(true),Gravity_(0.006f),dy_(0.04)
@@ -13,23 +14,24 @@ Arrow::Arrow(GameObject* parent)
 
 void Arrow::Initialize()
 {
+	timer_ = Instantiate<Timer>(this);
 	player_ = GetParent()->FindGameObject<Player>();
 	stage_ = GetParent()->FindGameObject<Stage>();
 
 	transform_.position_ = player_->GetPosition();
 	transform_.scale_ = { 2,2,2 };
-	aDir_ = player_->GetpDir();
+	PisRight_ = player_->GetisRight_();
 
-	if (aDir_ == LEFT)
+	if (PisRight_)
 	{
-		transform_.rotate_.y = -90;
-		AboxColl_ = new BoxCollider({ -0.3,0,0 }, { 0.2,0.2,0.2 });
+		transform_.rotate_.y = 90;
+		AboxColl_ = new BoxCollider({ 0.3,0,0 }, { 0.2,0.2,0.2 });
 		AddCollider(AboxColl_);
 	}
 	else
 	{
-		transform_.rotate_.y = 90;
-		AboxColl_ = new BoxCollider({ 0.3,0,0 }, { 0.2,0.2,0.2 });
+		transform_.rotate_.y = -90;
+		AboxColl_ = new BoxCollider({ -0.3,0,0 }, { 0.2,0.2,0.2 });
 		AddCollider(AboxColl_);
 	}
 }
@@ -44,13 +46,13 @@ void Arrow::Update()
 		dy_ -= Gravity_;
 
 		//プレイヤーの向きで進む方向を変える
-		if (aDir_ == LEFT)
+		if (PisRight_)
 		{
-			transform_.position_.x -= MOVE_SPEED;
+			transform_.position_.x += MOVE_SPEED;
 		}
 		else
 		{
-			transform_.position_.x += MOVE_SPEED;
+			transform_.position_.x -= MOVE_SPEED;
 		}
 	}
 
@@ -63,21 +65,6 @@ void Arrow::Draw()
 	Model::Draw(hArrow_);
 }
 
-bool Arrow::KillTimer(const float &time)
-{
-	static float timer = time;
-	timer -= 1.0f / 60.0f;
-	if (timer <= 0)
-	{
-		timer = time;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
 void Arrow::ArrowCollision()
 {
 	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
@@ -85,7 +72,7 @@ void Arrow::ArrowCollision()
 		if (AboxColl_->IsHit(stage_->GetStageboxColl()[i]))
 		{
 			isMove_ = false;
-			if (KillTimer(1))
+			if (timer_->TimeElapsed(1))
 			{
 				KillMe();
 			}

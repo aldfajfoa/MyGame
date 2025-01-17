@@ -21,7 +21,7 @@ void HP::Update()
 {
 	if (Input::IsKeyDown(DIK_P))
 	{
-		DecreaseHP(25);
+		DecreaseHP(50);
 	}
 
 	//currentHp_‚ªŒ¸‚Á‚Ä‚½‚ç‚»‚Ì•ªHP‰æ‘œ‚ğØ‚è”²‚­

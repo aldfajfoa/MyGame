@@ -1,6 +1,6 @@
 #include "Stage.h"
 #include "Player.h"
-#include "Engine/FBX.h"
+#include "Gool.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
 #include "Engine/CsvReader.h"
@@ -63,6 +63,12 @@ void Stage::SetMap()
 				pplayer_ = GetParent()->FindGameObject<Player>();
 				pplayer_->SetPositionXY(w, -h);
 				pplayer_->SetGround(-h);
+				break;
+			}
+			case 20://ÉSÅ[Éã
+			{
+				Gool* g = Instantiate<Gool>(this);
+				g->SetPositionXY(w, -h);
 			}
 			break;
 			}
@@ -120,7 +126,4 @@ void Stage::Draw()
 
 void Stage::Release()
 {
-	StageboxColl_.clear();
-	Map_.clear();
-	hBrocks_.clear();
 }
