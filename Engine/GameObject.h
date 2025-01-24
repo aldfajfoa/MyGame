@@ -33,8 +33,9 @@ public:
 	const int WINDOW_HEIGHT = 720;
 
 	struct BrockData {
-		int handle;
 		int BrockID;
+		BoxCollider* boxColl;
+		bool isDamage;
 	};
 
 	enum Dir//ƒvƒŒƒCƒ„[‚ÌŒü‚«

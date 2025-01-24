@@ -49,12 +49,16 @@ public:
 	void RotPlayer(const bool& isRight);//プレイヤーの向きを変える
 	bool GetisRight_() { return isRight_; }
 
-	void PlayerCollision();//プレイヤーの当たり判定周りの処理関数
+	//void PlayerCollision();//プレイヤーの当たり判定周りの処理関数
 
 	//CameraStopGround_を設定しそれを元にDeathGround_の設定もする
 	void SetCameraStopandDeathGround_(const float& Ground) { CameraStopGround_ = Ground; 
 	                                                          DeathGround_ = CameraStopGround_ - 20;}
 
 	BoxCollider* GetCenterBoxColl() { return PboxColl_[CENTER]; }//プレイヤーの中心当たり判定を取得
+
+	//何かに当たった
+	//引数：pTarget 当たった相手
+	void OnCollision(GameObject* pTarget) override;
 };
 

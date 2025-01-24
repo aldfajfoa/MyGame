@@ -25,32 +25,29 @@ void Stage::SetMap()
 	width_ = csv.GetWidth(0);//横幅を取得
 	height_ = csv.GetHeight();
 
-	Map_.resize(height_, vector<int>(width_));//サイズを変更
+	Map_.resize(height_, vector<BrockData>(width_));//サイズを変更
 
 	int wholeheight = height_;//全体の縦幅
 	height_ = (wholeheight - 1) / 2;//マップの縦幅取得
 
-	int scount = 0;
 	for (int h = 0; h < height_; h++)
 	{
 		for (int w = 0; w < width_; w++)
 		{
-			Map_[h][w] = csv.GetInt(w, h);
-			switch (Map_[h][w])
+			Map_[h][w].BrockID = csv.GetInt(w, h);
+			switch (Map_[h][w].BrockID)
 			{
 			case 100:
 			case 101:
+			case 102:
 			{
-				StageboxColl_.push_back(new BoxCollider({ (float)w,(float)-h,0 }, { 1.0,1.0,1.0 }));
-				AddCollider(StageboxColl_[scount]);
-				scount++;
+				Map_[h][w].boxColl = new BoxCollider({ (float)w,(float)-h,0 }, { 1,1,1 });
+				AddCollider(Map_[h][w].boxColl);
 			}
 			break;
 			}
 		}
 	}
-
-	scount = 0;
 
 	for (int h = 0; h < height_; h++)
 	{
@@ -82,6 +79,8 @@ void Stage::Initialize()
 {
 	hBrocks_.push_back(Model::Load("Box.fbx"));
 	hBrocks_.push_back(Model::Load("Box2.fbx"));
+	hBrocks_.push_back(Model::Load("Box3.fbx"));
+
 
 	for (int i = 0; i < hBrocks_.size(); i++)
 	{
@@ -101,20 +100,15 @@ void Stage::Draw()
 	{
 		for (float x = 0; x < width_; x++)
 		{
-			switch (Map_[y][x])
+			switch (Map_[y][x].BrockID)
 			{
 			case 100:
-			{
-				t.position_ = { x,-y,0 };
-				Model::SetTransform(hBrocks_[Map_[y][x]-100], t);
-				Model::Draw(hBrocks_[Map_[y][x] - 100]);
-				break;
-			}
 			case 101:
+			case 102:
 			{
 				t.position_ = { x,-y,0 };
-				Model::SetTransform(hBrocks_[Map_[y][x] - 100], t);
-				Model::Draw(hBrocks_[Map_[y][x] - 100]);
+				Model::SetTransform(hBrocks_[Map_[y][x].BrockID-100], t);
+				Model::Draw(hBrocks_[Map_[y][x].BrockID - 100]);
 				break;
 			}
 			default:

@@ -7,6 +7,7 @@
 #include "Engine/Camera.h"
 #include "Engine/BoxCollider.h"
 #include "Engine/SceneManager.h"
+#include "Engine/Debug.h"
 
 Player::Player(GameObject* parent)
 	:GameObject(parent,"Player"), hPlayer_(-1), Ground_(0),isLeftMove_(true), isRightMove_(true),isJump_(true), isRight_(true)
@@ -20,12 +21,13 @@ void Player::Initialize()
 	assert(hPlayer_ >= 0);
 	transform_.rotate_.y = 90;
 
-	//上下左右の当たり判定
-	PboxColl_[0] = new BoxCollider({ -0.3, 0.1,0 }, { 0.3,1.0,0.1 });//左
-	PboxColl_[1] = new BoxCollider({  0.5, 0.1,0 }, { 0.3,1.0,0.1 });//右
-	PboxColl_[2] = new BoxCollider({  0.1, 0.7,0 }, { 0.5,0.3,0.1 });//上
-	PboxColl_[3] = new BoxCollider({  0.1,-20, 0 }, { 0.5, 40,0.1 });//下
-	PboxColl_[4] = new BoxCollider({ 0, 0.1, 0 }, { 0.7, 1.2,0.1 });//中心(敵やゴールと判定する用)
+	//上下左右の当たり判定(ブロックやギミックとの判定用)
+	PboxColl_[0] = new BoxCollider({ -0.3, 0.1, 0 }, { 0.3,   1, 0.1 });//左
+	PboxColl_[1] = new BoxCollider({  0.5, 0.1, 0 }, { 0.3,   1, 0.1 });//右
+	PboxColl_[2] = new BoxCollider({  0.1, 0.7, 0 }, { 0.5, 0.3, 0.1 });//上
+	PboxColl_[3] = new BoxCollider({  0.1,-0.5, 0 }, { 0.5,   1, 0.1 });//下
+	//中心(敵やゴールとの判定用)
+	PboxColl_[4] = new BoxCollider({  0,   0.1, 0 }, { 0.7, 1.2, 0.1 });
 	for (int i = 0; i < PBOX_NUM; i++)
 	{
 		AddCollider(PboxColl_[i]);
@@ -57,12 +59,14 @@ void Player::Update()
 		pSceneManager->ChangeScene(SCENE_ID_OVER);
 	}
 
-	PlayerCollision();
-
 	if (Input::IsKeyDown(DIK_F))//矢を撃つ
 	{
 		Instantiate<Arrow>(FindObject("PlayScene"));
 	}
+
+	isLeftMove_ = true;
+	isRightMove_ = true;
+	Ground_ = -999;
 }
 
 void Player::Draw()
@@ -94,56 +98,68 @@ void Player::RotPlayer(const bool& isRight)
 	}
 }
 
-void Player::PlayerCollision()
+void Player::OnCollision(GameObject* pTarget)
 {
-	//左当たり判定
-	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
+	//左
+	for (int y = 0; y < stage_->Getheight(); y++)
 	{
-		if (PboxColl_[LEFT]->IsHit(stage_->GetStageboxColl()[i])) {
-			isLeftMove_ = false;
-			break;
-		}
-		else
+		for (int x = 0; x < stage_->Getwidth(); x++)
 		{
-			isLeftMove_ = true;
+			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
+			{
+				if (PboxColl_[LEFT]->IsHit(stage_->GetMap()[y][x].boxColl)) {
+					isLeftMove_ = false;//当たったら左に進めなくする
+					break;
+				}
+			}
 		}
 	}
 
-	//右当たり判定
-	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
+	//右
+	for (int y = 0; y < stage_->Getheight(); y++)
 	{
-		if (PboxColl_[RIGHT]->IsHit(stage_->GetStageboxColl()[i])) {
-			isRightMove_ = false;
-			break;
-		}
-		else
+		for (int x = 0; x < stage_->Getwidth(); x++)
 		{
-			isRightMove_ = true;
+			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
+			{
+				if (PboxColl_[RIGHT]->IsHit(stage_->GetMap()[y][x].boxColl)) {
+					isRightMove_ = false;//当たったら右に進めなくする
+					break;
+				}
+			}
 		}
 	}
 
 	//上当たり判定
-	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
+	for (int y = 0; y < stage_->Getheight(); y++)
 	{
-		if (isJump_) {
-			if (PboxColl_[TOP]->IsHit(stage_->GetStageboxColl()[i])) {
-				jumpSpeed_ = 0;
-				isJump_ = false;
-				break;
+		for (int x = 0; x < stage_->Getwidth(); x++)
+		{
+			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
+			{
+				if (isJump_) {
+					if (PboxColl_[TOP]->IsHit(stage_->GetMap()[y][x].boxColl)) {
+						jumpSpeed_ = 0;
+						isJump_ = false;
+						break;
+					}
+				}
 			}
 		}
 	}
 
 	//下当たり判定
-	for (int i = 0; i < stage_->GetStageboxColl().size(); i++)
+	for (int y = 0; y < stage_->Getheight(); y++)
 	{
-		if (PboxColl_[UNDER]->IsHit(stage_->GetStageboxColl()[i])) {
-			Ground_ = stage_->GetStageboxColl()[i]->Getcenter().y+0.5;
-			break;
-		}
-		else
+		for (int x = 0; x < stage_->Getwidth(); x++)
 		{
-			Ground_ = -999;
+			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
+			{
+				if (PboxColl_[UNDER]->IsHit(stage_->GetMap()[y][x].boxColl)) {
+					Ground_ = stage_->GetboxColl(y, x)->Getcenter().y + 0.5;
+					break;
+				}
+			}
 		}
 	}
 }
@@ -157,7 +173,7 @@ void Player::MovePlayer()
 			transform_.position_.x -= 0.05;
 		}
 	}
-	if (Input::IsKey(DIK_LEFT))
+	if (Input::IsKey(DIK_LEFT))//左向きにする
 	{
 		isRight_ = false;
 	}
@@ -169,7 +185,7 @@ void Player::MovePlayer()
 			transform_.position_.x += 0.05;
 		}
 	}
-	if (Input::IsKey(DIK_RIGHT))//右へ進む
+	if (Input::IsKey(DIK_RIGHT))//右向きにする
 	{
 		isRight_ = true;
 	}
@@ -183,8 +199,8 @@ void Player::MovePlayer()
 	}
 
 
-	jumpSpeed_ += GRAVITY;//速度+=加速度
-	transform_.position_.y -= jumpSpeed_;//座標+=速度
+	jumpSpeed_ += GRAVITY;
+	transform_.position_.y -= jumpSpeed_;
 
 	RotPlayer(isRight_);
 }

@@ -24,6 +24,9 @@ BoxCollider::BoxCollider(XMFLOAT3 basePos, XMFLOAT3 size)
 //–ß’lFÚG‚µ‚Ä‚ê‚Îtrue
 bool BoxCollider::IsHit(Collider* target)
 {
+	if (target == nullptr) {
+		return false;
+	}
 	if (target->type_ == COLLIDER_BOX)
 		return IsHitBoxVsBox((BoxCollider*)target, this);
 	else
