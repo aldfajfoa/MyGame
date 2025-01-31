@@ -35,7 +35,6 @@ public:
 	struct BrockData {
 		int BrockID;
 		BoxCollider* boxColl;
-		bool isDamage;
 	};
 
 	enum Dir//ƒvƒŒƒCƒ„[‚ÌŒü‚«
@@ -44,7 +43,8 @@ public:
 		RIGHT,
 		TOP,
 		UNDER,
-		CENTER
+		CENTER,
+		MAX,
 	};
 
 	struct Size {

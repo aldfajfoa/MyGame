@@ -1,6 +1,7 @@
 #include "Stage.h"
 #include "Player.h"
 #include "Gool.h"
+#include "Beast.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
 #include "Engine/CsvReader.h"
@@ -62,10 +63,18 @@ void Stage::SetMap()
 				pplayer_->SetGround(-h);
 				break;
 			}
+			case 1://Beast
+			{
+				Beast *b = Instantiate<Beast>(this);
+				b->SetPositionXY(w, -h);
+				b->SetGround(-h);
+				break;
+			}
 			case 20://ƒS[ƒ‹
 			{
 				Gool* g = Instantiate<Gool>(this);
 				g->SetPositionXY(w, -h);
+				break;
 			}
 			break;
 			}

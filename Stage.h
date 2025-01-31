@@ -19,7 +19,6 @@ class Stage :
 	//その他の変数
 	int width_; //ステージ幅
 	int height_;//ステージ高さ
-	//vector<vector<int>> Map_;//マップのデータを持つ配列
 	vector<vector<BrockData>> Map_;//マップのデータを持つ配列
 
 public:
@@ -29,11 +28,11 @@ public:
 	void Draw() override;
 	void Release() override;
 
+	void SetMap();
+
 	int Getwidth() { return width_; }
 	int Getheight() { return height_; }
-	vector<vector<BrockData>> GetMap() { return Map_; }
-	BoxCollider* GetboxColl(int x,int y){return Map_[x][y].boxColl; }
-	vector<BoxCollider*> GetStageboxColl(){return StageboxColl_;}
-	void SetMap();
+	BoxCollider* GetboxColl(const int& x, const int& y){return Map_[x][y].boxColl; }
+	int GetBrockID(const int& x, const int& y) { return Map_[x][y].BrockID; }
 };
 

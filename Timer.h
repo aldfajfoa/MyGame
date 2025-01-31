@@ -12,6 +12,10 @@ public:
 	void Draw() override {};
 	void Release() override;
 
+	void ResetTime(const float& time) { currentTime_ = time; }//タイマーのリセット
 	bool TimeElapsed(const float& time);//指定した秒数が経ったらtrueを返す
+	//指定した秒数が経ったらtrueを返す
+	//勝手にリセットされないタイマー
+	bool NoResetTimeElapsed();
 };
 

@@ -5,8 +5,11 @@ class FBX;
 class BoxCollider;
 class Stage;
 class HP;
+class Arrow;
+class Timer;
 
 const int PBOX_NUM = 5;
+const int ARROW_NUM = 5;
 
 class Player :
     public GameObject
@@ -17,8 +20,11 @@ class Player :
 
 	//ポインタ
 	BoxCollider* PboxColl_[PBOX_NUM];
+	Arrow* arrows_[ARROW_NUM];
 	Stage* stage_;
 	HP* hp_;
+	Timer* timer_;
+	Timer* ArrowInterval_;
 
 	//ハンドル
 	int hPlayer_;
@@ -30,9 +36,13 @@ class Player :
 	float CameraStopGround_;//これより下にいくとカメラがプレイヤーを追わなくなる
 	float DeathGround_;//ここまで落ちたらゲームオーバー
 	bool isLeftMove_, isRightMove_, isJump_;//左右移動とジャンプができるかの判定
+	bool isPdamage_[4];//このどれかがtrueの間はダメージを受ける
+	bool isfirst_;//ダメージを受けるブロックに触れた瞬間かどうか
+	int currentArrow_;
 
 	//関数
 	void MovePlayer();//プレイヤー移動
+	void DiscernBrock(const int& x, const int& y, const Dir& dir);
 public:
 
 	Player(GameObject* parent);
@@ -40,25 +50,22 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Release() override;
-
-	void SetGround(const float& ground) { Ground_ = ground; }
-
-	void SetPositionXY(const float& x, const float& y) { transform_.position_ = { x,y,0 }; }//プレイヤーのポジション
-	XMFLOAT3 GetPosition() { return transform_.position_; }
-
-	void RotPlayer(const bool& isRight);//プレイヤーの向きを変える
-	bool GetisRight_() { return isRight_; }
-
-	//void PlayerCollision();//プレイヤーの当たり判定周りの処理関数
-
-	//CameraStopGround_を設定しそれを元にDeathGround_の設定もする
-	void SetCameraStopandDeathGround_(const float& Ground) { CameraStopGround_ = Ground; 
-	                                                          DeathGround_ = CameraStopGround_ - 20;}
-
-	BoxCollider* GetCenterBoxColl() { return PboxColl_[CENTER]; }//プレイヤーの中心当たり判定を取得
-
 	//何かに当たった
 	//引数：pTarget 当たった相手
 	void OnCollision(GameObject* pTarget) override;
+
+	void SetGround(const float& ground) { Ground_ = ground; }
+	void SetPositionXY(const float& x, const float& y) { transform_.position_ = { x,y,0 }; }//プレイヤーのポジション
+	//CameraStopGround_を設定しそれを元にDeathGround_の設定もする
+	void SetCameraStopandDeathGround_(const float& Ground) { CameraStopGround_ = Ground;
+		                                                     DeathGround_ = CameraStopGround_ - 20;}
+
+	XMFLOAT3 GetPosition() { return transform_.position_; }
+	bool GetisRight_() { return isRight_; }
+	int GetARROW_NUM() { return ARROW_NUM; }
+	Arrow* Getarrows(const int& index) { return arrows_[index]; }
+	BoxCollider* GetCenterBoxColl() { return PboxColl_[CENTER]; }//プレイヤーの中心当たり判定を取得
+
+	void RotPlayer(const bool& isRight);//プレイヤーの向きを変える
 };
 

@@ -25,6 +25,7 @@ class Arrow :
 	bool isMove_;
 	float dy_;
 	float Gravity_;
+	bool isAlive_;
 
 	//ä÷êî
 	void ArrowCollision();
@@ -34,5 +35,10 @@ public:
 	void Update() override;
 	void Draw() override;
 	void Release() override;
+	
+	BoxCollider* GetAboxColl() { return AboxColl_; }
+	void SetisAlive(const bool& isAlive) { isAlive_ = isAlive; }
+	void SetArrowDir(const bool& PisRight);
+	void ResetArrow();
 };
 

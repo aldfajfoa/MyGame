@@ -74,5 +74,7 @@ public:
 
 	//ˆÊ’u‚ðŽæ“¾
 	XMFLOAT3 Getcenter() { return center_; }
+
+	void Setcenter(XMFLOAT3 center) { center_ = center; }
 };
 

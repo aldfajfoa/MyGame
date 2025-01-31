@@ -2,6 +2,8 @@
 #include "Stage.h"
 #include "Arrow.h"
 #include "PlayScene.h"
+#include "Timer.h"
+#include "HP.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
 #include "Engine/Camera.h"
@@ -10,7 +12,7 @@
 #include "Engine/Debug.h"
 
 Player::Player(GameObject* parent)
-	:GameObject(parent,"Player"), hPlayer_(-1), Ground_(0),isLeftMove_(true), isRightMove_(true),isJump_(true), isRight_(true)
+	:GameObject(parent,"Player"), hPlayer_(-1), Ground_(0),isLeftMove_(true), isRightMove_(true),isJump_(true), isRight_(true),isfirst_(true)
 {
 	jumpSpeed_ = 0.0f;
 }
@@ -34,10 +36,23 @@ void Player::Initialize()
 	}
 
 	stage_ = GetParent()->FindGameObject<Stage>();
+	hp_ = nullptr;
+	timer_ = Instantiate<Timer>(this);
+	ArrowInterval_ = Instantiate<Timer>(this);
+	ArrowInterval_->ResetTime(0);
+
+	for (int a = 0; a < ARROW_NUM; a++)
+	{
+		arrows_[a] = Instantiate<Arrow>(FindObject("PlayScene"));
+	}
 }
 
 void Player::Update()
 {
+	if (hp_ == nullptr)
+	{
+		hp_ = GetParent()->FindGameObject<HP>();
+	}
 	MovePlayer();
 
 	if (transform_.position_.y < Ground_) {
@@ -59,14 +74,49 @@ void Player::Update()
 		pSceneManager->ChangeScene(SCENE_ID_OVER);
 	}
 
-	if (Input::IsKeyDown(DIK_F))//矢を撃つ
+	//Fキーで矢を撃つ
+	if (ArrowInterval_->NoResetTimeElapsed())
 	{
-		Instantiate<Arrow>(FindObject("PlayScene"));
+		if (Input::IsKeyDown(DIK_F))
+		{
+			arrows_[currentArrow_]->SetPosition(transform_.position_);
+			arrows_[currentArrow_]->SetArrowDir(isRight_);
+			arrows_[currentArrow_]->SetisAlive(true);
+			currentArrow_++;
+			if (currentArrow_ == ARROW_NUM - 1)
+			{
+				currentArrow_ = 0;
+			}
+			ArrowInterval_->ResetTime(1);
+		}
+	}
+	
+	//isPdamage_のどれかがtrueだったらダメージを受ける
+	if (isPdamage_[LEFT] || isPdamage_[RIGHT] || isPdamage_[TOP] || isPdamage_[UNDER])
+	{
+		if (isfirst_)//当たった瞬間は即ダメージを受ける
+		{
+			hp_->DecreaseHP(20);
+			isfirst_ = false;
+		}
+		if (timer_->TimeElapsed(1))//その後は秒間隔でダメージ
+		{
+			hp_->DecreaseHP(20);
+		}
+	}
+	else
+	{
+		isfirst_ = true;
+		timer_->ResetTime(0);
 	}
 
 	isLeftMove_ = true;
 	isRightMove_ = true;
 	Ground_ = -999;
+	for (int dir = 0; dir < 4; dir++)
+	{
+		isPdamage_[dir] = false;
+	}
 }
 
 void Player::Draw()
@@ -88,8 +138,7 @@ void Player::RotPlayer(const bool& isRight)
 			transform_.rotate_.y -= 30;
 		}
 	}
-
-	if (isRight_)
+	else
 	{
 		if (transform_.rotate_.y != 90)
 		{
@@ -100,64 +149,33 @@ void Player::RotPlayer(const bool& isRight)
 
 void Player::OnCollision(GameObject* pTarget)
 {
-	//左
 	for (int y = 0; y < stage_->Getheight(); y++)
 	{
 		for (int x = 0; x < stage_->Getwidth(); x++)
 		{
-			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
+			if (stage_->GetboxColl(y, x) != nullptr)//ブロックの当たり判定がnullptr(空白)じゃなかったら当たり判定
 			{
-				if (PboxColl_[LEFT]->IsHit(stage_->GetMap()[y][x].boxColl)) {
+				if (PboxColl_[LEFT]->IsHit(stage_->GetboxColl(y, x))) {
 					isLeftMove_ = false;//当たったら左に進めなくする
-					break;
+					DiscernBrock(y, x, LEFT);
 				}
-			}
-		}
-	}
 
-	//右
-	for (int y = 0; y < stage_->Getheight(); y++)
-	{
-		for (int x = 0; x < stage_->Getwidth(); x++)
-		{
-			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
-			{
-				if (PboxColl_[RIGHT]->IsHit(stage_->GetMap()[y][x].boxColl)) {
+				if (PboxColl_[RIGHT]->IsHit(stage_->GetboxColl(y, x))) {
 					isRightMove_ = false;//当たったら右に進めなくする
-					break;
+					DiscernBrock(y, x, RIGHT);
 				}
-			}
-		}
-	}
 
-	//上当たり判定
-	for (int y = 0; y < stage_->Getheight(); y++)
-	{
-		for (int x = 0; x < stage_->Getwidth(); x++)
-		{
-			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
-			{
 				if (isJump_) {
-					if (PboxColl_[TOP]->IsHit(stage_->GetMap()[y][x].boxColl)) {
+					if (PboxColl_[TOP]->IsHit(stage_->GetboxColl(y, x))) {
 						jumpSpeed_ = 0;
 						isJump_ = false;
-						break;
+					    DiscernBrock(y, x, TOP);
 					}
 				}
-			}
-		}
-	}
 
-	//下当たり判定
-	for (int y = 0; y < stage_->Getheight(); y++)
-	{
-		for (int x = 0; x < stage_->Getwidth(); x++)
-		{
-			if (stage_->GetboxColl(y, x) != nullptr)//ブロックが999(空白)じゃなかったら当たり判定
-			{
-				if (PboxColl_[UNDER]->IsHit(stage_->GetMap()[y][x].boxColl)) {
-					Ground_ = stage_->GetboxColl(y, x)->Getcenter().y + 0.5;
-					break;
+				if (PboxColl_[UNDER]->IsHit(stage_->GetboxColl(y, x))) {
+					Ground_ = stage_->GetboxColl(y, x)->Getcenter().y + 0.5;//地面に乗せる
+					DiscernBrock(y, x, UNDER);
 				}
 			}
 		}
@@ -166,28 +184,22 @@ void Player::OnCollision(GameObject* pTarget)
 
 void Player::MovePlayer()
 {
-	if (isLeftMove_)
+	if (Input::IsKey(DIK_LEFT))//左向きにする
 	{
-		if (Input::IsKey(DIK_LEFT))//左へ進む
+		isRight_ = false;
+		if (isLeftMove_)//左へ進む
 		{
 			transform_.position_.x -= 0.05;
 		}
 	}
-	if (Input::IsKey(DIK_LEFT))//左向きにする
-	{
-		isRight_ = false;
-	}
 
-	if (isRightMove_)
-	{
-		if (Input::IsKey(DIK_RIGHT))//右へ進む
-		{
-			transform_.position_.x += 0.05;
-		}
-	}
 	if (Input::IsKey(DIK_RIGHT))//右向きにする
 	{
 		isRight_ = true;
+		if (isRightMove_)//右へ進む
+		{
+			transform_.position_.x += 0.05;
+		}
 	}
 
 	if (isJump_)
@@ -198,10 +210,18 @@ void Player::MovePlayer()
 		}
 	}
 
-
 	jumpSpeed_ += GRAVITY;
 	transform_.position_.y -= jumpSpeed_;
 
 	RotPlayer(isRight_);
+}
+
+void Player::DiscernBrock(const int& x, const int& y, const Dir& dir)
+{
+	switch (stage_->GetBrockID(x, y))
+	{
+	case 102:
+		isPdamage_[dir] = true;
+	}
 }
 

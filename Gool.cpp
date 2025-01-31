@@ -27,7 +27,7 @@ void Gool::Update()
 	//プレイヤーと当たったらクリア画面へ
 	if (GboxColl_->IsHit(player_->GetCenterBoxColl())) 
 	{
-		if (timer_->TimeElapsed(2))
+		if (timer_->TimeElapsed(1))
 		{
 			SceneManager* pSceneManager = (SceneManager*)FindObject("SceneManager");
 			pSceneManager->ChangeScene(SCENE_ID_CLEAR);
