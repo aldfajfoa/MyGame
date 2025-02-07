@@ -39,6 +39,8 @@ class Player :
 	bool isPdamage_[4];//このどれかがtrueの間はダメージを受ける
 	bool isfirst_;//ダメージを受けるブロックに触れた瞬間かどうか
 	int currentArrow_;
+	float Dist_;
+	int Dir_;
 
 	//関数
 	void MovePlayer();//プレイヤー移動
@@ -65,7 +67,12 @@ public:
 	int GetARROW_NUM() { return ARROW_NUM; }
 	Arrow* Getarrows(const int& index) { return arrows_[index]; }
 	BoxCollider* GetCenterBoxColl() { return PboxColl_[CENTER]; }//プレイヤーの中心当たり判定を取得
+	void setDistandDir(float dist, float dir) {
+		Dist_ = dist;
+		Dir_ = dir;
+	}
 
 	void RotPlayer(const bool& isRight);//プレイヤーの向きを変える
+	void BlowawayPlayer();//プレイヤーを吹っ飛ばす
 };
 

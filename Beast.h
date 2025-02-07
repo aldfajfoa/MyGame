@@ -32,6 +32,7 @@ class Beast :
 	float jumpSpeed_;//ジャンプの高さ
 	int Ground_;//地面
 	bool isRight_;//右向きかどうか
+	bool isGround_;
 	bool isLeftMove_, isRightMove_, isJump_;//左右移動とジャンプができるかの判定
 	int BeastHp_;//ビーストの体力
 	bool isChase_;//プレイヤーを追いかけるか

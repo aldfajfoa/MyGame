@@ -21,11 +21,11 @@ Beast::Beast(GameObject* parent)
 void Beast::Initialize()
 {
 	//上下左右の当たり判定(ブロックやギミックとの判定用)
-	BboxColl_[0] = new BoxCollider({ -0.5, 0.08, 0 }, { 0.3, 0.8, 0.1 });//左
-	BboxColl_[1] = new BoxCollider({  0.5, 0.08, 0 }, { 0.3, 0.8, 0.1 });//右
+	BboxColl_[0] = new BoxCollider({ -0.4, 0.08, 0 }, { 0.7, 0.8, 0.1 });//左
+	BboxColl_[1] = new BoxCollider({  0.4, 0.08, 0 }, { 0.7, 0.8, 0.1 });//右
 	BboxColl_[2] = new BoxCollider({    0,  0.5, 0 }, {   1, 0.3, 0.1 });//上
-	BboxColl_[3] = new BoxCollider({  0.1, -0.5, 0 }, {   1,   1, 0.1 });//下
-	BboxColl_[4] = new BoxCollider({    0,    0, 0 }, { 1.2, 0.9, 0.1 });//中心
+	BboxColl_[3] = new BoxCollider({  0.1, -0.5, 0 }, {   1, 0.6, 0.1 });//下
+	BboxColl_[4] = new BoxCollider({    0,    0, 0 }, { 1.2, 0.8, 0.1 });//中心
 
 	for (int i = 0; i < BBOX_NUM; i++)
 	{
@@ -58,7 +58,7 @@ void Beast::Update()
 		KillMe();
 	}
 
-	MoveBeast();
+	//MoveBeast();
 
 	if (transform_.position_.y < Ground_) {
 		transform_.position_.y = Ground_;
@@ -110,12 +110,20 @@ void Beast::OnCollision(GameObject* pTarget)
 			{
 				if (BboxColl_[LEFT]->IsHit(stage_->GetboxColl(y, x))) {
 					isLeftMove_ = false;//当たったら左に進めなくする
-					jumpSpeed_ = -sqrtf(GRAVITY * JUMP_HEIGHT);//ジャンプさせる
+					if (isGround_)
+					{
+						jumpSpeed_ = -sqrtf(GRAVITY * JUMP_HEIGHT);//ジャンプさせる
+						isGround_ = false;
+					}
 				}
 
 				if (BboxColl_[RIGHT]->IsHit(stage_->GetboxColl(y, x))) {
 					isRightMove_ = false;//当たったら右に進めなくする
-					jumpSpeed_ = -sqrtf(GRAVITY * JUMP_HEIGHT);//ジャンプさせる
+					if (isGround_)
+					{
+						jumpSpeed_ = -sqrtf(GRAVITY * JUMP_HEIGHT);//ジャンプさせる
+						isGround_ = false;
+					}
 				}
 
 				if (isJump_) {
@@ -127,6 +135,7 @@ void Beast::OnCollision(GameObject* pTarget)
 
 				if (BboxColl_[UNDER]->IsHit(stage_->GetboxColl(y, x))) {
 					Ground_ = stage_->GetboxColl(y, x)->Getcenter().y + 0.5;//地面に乗せる
+					isGround_ = true;
 				}
 			}
 		}
@@ -145,8 +154,13 @@ void Beast::OnCollision(GameObject* pTarget)
 		isChase_ = true;
 	}
 
-	if (BboxColl_[CENTER]->IsHit(player_->GetCenterBoxColl())) {
+	if (BboxColl_[LEFT]->IsHit(player_->GetCenterBoxColl())) {
 		hp_->DecreaseHP(40);
+		player_->setDistandDir(5,-1);
+	}
+	if (BboxColl_[RIGHT]->IsHit(player_->GetCenterBoxColl())) {
+		hp_->DecreaseHP(40);
+		player_->setDistandDir(5,1);
 	}
 }
 
@@ -165,8 +179,6 @@ void Beast::MoveBeast()
 		}
 		else
 		{
-			//isLeftMove_ = false;
-			//isRightMove_ = true;
 		}
 	}
 	
@@ -186,35 +198,4 @@ void Beast::MoveBeast()
 	transform_.position_.y -= jumpSpeed_;
 
 	RotBeast(isRight_);
-	///////////////////////////////////////
-	/*if (Input::IsKey(DIK_A))//左向きにする
-	{
-		isRight_ = false;
-		if (isLeftMove_)//左へ進む
-		{
-			transform_.position_.x -= 0.05;
-		}
-	}
-
-	if (Input::IsKey(DIK_D))//右向きにする
-	{
-		isRight_ = true;
-		if (isRightMove_)//右へ進む
-		{
-			transform_.position_.x += 0.05;
-		}
-	}
-
-	if (isJump_)
-	{
-		if (Input::IsKey(DIK_W))//ジャンプ
-		{
-			jumpSpeed_ = -sqrtf(GRAVITY * JUMP_HEIGHT);
-		}
-	}
-
-	jumpSpeed_ += GRAVITY;
-	transform_.position_.y -= jumpSpeed_;
-
-	RotBeast(isRight_);*/
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/GameObject.h"
 class Sprite;
+class Timer;
 
 class HP :
     public GameObject
@@ -13,8 +14,12 @@ class HP :
 	//ハンドル
 	int hHp_;
 
+	//ポインタ
+	Timer* isDamageTime_;
+
 	//その他の変数
 	float currentHp_;//現在HP
+	bool isDamage_;
 public:
 	HP(GameObject* parent);
 	void Initialize() override;
@@ -25,7 +30,11 @@ public:
 	//HPを減らす関数
 	//引数は減らしたい値
 	void DecreaseHP(const int& decreaseNum) {
-		currentHp_ -= decreaseNum;
+		if (isDamage_)
+		{
+			isDamage_ = false;
+			currentHp_ -= decreaseNum;
+		}
 	}
 };
 

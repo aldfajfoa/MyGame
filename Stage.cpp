@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Gool.h"
 #include "Beast.h"
+#include "Vine.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
 #include "Engine/CsvReader.h"
@@ -21,7 +22,7 @@ void Stage::SetMap()
 		Map_.clear();
 	}
 	CsvReader csv;//データを読むクラスのインスタンスを作成
-	bool ret = csv.Load("Stage.csv");
+	bool ret = csv.Load("Stage2.csv");
 	assert(ret);
 	width_ = csv.GetWidth(0);//横幅を取得
 	height_ = csv.GetHeight();
@@ -74,6 +75,12 @@ void Stage::SetMap()
 			{
 				Gool* g = Instantiate<Gool>(this);
 				g->SetPositionXY(w, -h);
+				break;
+			}
+			case 32://ツタ
+			{
+				Vine* v = Instantiate<Vine>(this);
+				v->SetPositionXY(w, -h);
 				break;
 			}
 			break;

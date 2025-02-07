@@ -91,6 +91,8 @@ void Player::Update()
 		}
 	}
 	
+	BlowawayPlayer();
+
 	//isPdamage_‚Ì‚Ç‚ê‚©‚ªtrue‚¾‚Á‚½‚çƒ_ƒ[ƒW‚ðŽó‚¯‚é
 	if (isPdamage_[LEFT] || isPdamage_[RIGHT] || isPdamage_[TOP] || isPdamage_[UNDER])
 	{
@@ -144,6 +146,26 @@ void Player::RotPlayer(const bool& isRight)
 		{
 			transform_.rotate_.y += 30;
 		}
+	}
+}
+
+
+
+void Player::BlowawayPlayer()
+{
+	if (Dist_ > 0)
+	{
+		if ((Dir_ == -1 && isLeftMove_) || (Dir_ == 1 && isRightMove_))
+		{
+			transform_.position_.x += 0.2 * Dir_;
+		}
+		jumpSpeed_ = -sqrtf(GRAVITY * (JUMP_HEIGHT / 20));
+		Dist_--;
+	}
+	else if (Dist_ <= 0)
+	{
+		Dist_ = 0;
+		Dir_ = 0;
 	}
 }
 

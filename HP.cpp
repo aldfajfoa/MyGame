@@ -1,15 +1,17 @@
 #include "HP.h"
+#include "Timer.h"
 #include "Engine/Image.h"
 #include "Engine/Input.h"
 #include "Engine/SceneManager.h"
 
 HP::HP(GameObject* parent)
-	:GameObject(parent, "HP"),hHp_(-1)
+	:GameObject(parent, "HP"),hHp_(-1),isDamage_(true)
 {
 	hHp_ = Image::Load("HP.png");
 	assert(hHp_ >= 0);
 
 	currentHp_ = MAX_HP;
+	isDamageTime_ = Instantiate<Timer>(this);
 }
 
 void HP::Initialize()
@@ -19,6 +21,14 @@ void HP::Initialize()
 
 void HP::Update()
 {
+	if (isDamage_ == false)
+	{
+		if (isDamageTime_->TimeElapsed(1))
+		{
+			isDamage_ = true;
+		}
+	}
+
 	if (Input::IsKeyDown(DIK_P))
 	{
 		DecreaseHP(50);
